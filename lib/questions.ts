@@ -378,4 +378,118 @@ export const questions: Question[] = [
       "map vs flatMap",
     ],
   },
+  {
+    id: "jvm-new",
+    title: "new 一个对象时 JVM 做了什么？",
+    collections: ["object-create", "object-layout"],
+    level: "基础",
+    answer:
+      "先按符号引用找到类，没初始化就加载。然后在堆上分配，优先 TLAB 里指针碰撞；堆碎的收集器才走空闲列表。内存清零，写 Mark Word 和类型指针，最后 invokespecial <init>。大对象可能直接进老年代。逃逸分析是优化，主路径仍是进堆。",
+    points: [
+      "类检查 → 分配 → 零值 → 对象头 → 构造",
+      "TLAB 降低堆上竞争",
+      "构造器跑之前对象已经在堆上",
+    ],
+  },
+  {
+    id: "jvm-header",
+    title: "对象内存怎么布局？空 Object 多大？",
+    collections: ["object-layout"],
+    level: "进阶",
+    answer:
+      "HotSpot：Mark Word + 类型指针 + 实例字段 + 对齐。64 位 Mark Word 通常 8 字节，压缩类指针时类型指针 4 字节，按 8 字节对齐，空 Object 常见 16 字节。Mark Word 里有锁状态、GC 年龄、identity hashCode。数字用 JOL 验证，别死记一个版本。",
+    points: [
+      "头不是装饰，锁和年龄都在上面",
+      "压缩 Oops，堆过大可能关掉",
+      "以 JOL 为准",
+    ],
+  },
+  {
+    id: "jvm-gcroot",
+    title: "怎么判断一个对象是垃圾？循环引用能回收吗？",
+    collections: ["gc-root"],
+    level: "基础",
+    answer:
+      "可达性分析：从 GC Roots 出发走不到的就是垃圾。根包括栈上引用、静态字段、JNI 等。循环引用只要脱离根就能收，这是引用计数做不到的。Java 里所谓泄漏通常是强引用还挂在静态集合、缓存、监听器上。",
+    points: [
+      "根是起点不是对象自己",
+      "环可以收",
+      "泄漏 = 该断的强引用没断",
+    ],
+  },
+  {
+    id: "jvm-young-full",
+    title: "Minor GC、Young GC、Full GC、Mixed GC 有什么区别？",
+    collections: ["generational-gc", "g1"],
+    level: "基础",
+    answer:
+      "Young GC 和 Minor GC 在 HotSpot 里基本是一回事：只收年轻代。Full GC 收整堆（年轻代+老年代，常连带元空间），停顿最重。Mixed GC 是 G1 的：一次停顿里收所有年轻 Region 加一部分老 Region，用来代替动不动 Full。Major GC 这个词不标准，别用来答题。",
+    points: ["Minor = Young", "Full = 整堆兜底", "Mixed = G1 专有"],
+  },
+  {
+    id: "jvm-oom-soe",
+    title: "OOM 和 StackOverflowError 差在哪？OOM 只有堆满吗？",
+    collections: ["oom"],
+    level: "基础",
+    answer:
+      "StackOverflowError 是线程栈太深，递归或 -Xss 太小，和堆无关。OOM 要看子类型：Java heap space 是堆；Metaspace 是类元数据；Direct buffer 是堆外；unable to create native thread 是线程把本地内存吃完。先读异常消息，再决定加 -Xmx 还是 dump 查泄漏。",
+    points: [
+      "SOE 在栈，OOM 在堆或本地内存",
+      "先看 Error 后面的句子",
+      "别一上来只加堆",
+    ],
+  },
+  {
+    id: "jvm-tricolor",
+    title: "三色标记为什么会漏标？写屏障和 STW 干什么？",
+    collections: ["tricolor", "cms", "g1"],
+    level: "进阶",
+    answer:
+      "并发标记时应用还在改引用：如果一个黑对象新指向白对象，同时原路径被砍掉，这个白对象会漏标，被当成垃圾。写屏障在赋值时记账：CMS 增量更新记新边，G1 SATB 记被覆盖的旧引用。STW 只留给根扫描、再标记这种必须静止的片段，不是 GC 全程停。漏标会坏数据，多标只是浮动垃圾。",
+    points: [
+      "漏标条件：黑指向白且原路径消失",
+      "CMS 增量更新 / G1 SATB",
+      "STW 是片段不是收集器名",
+    ],
+  },
+  {
+    id: "jvm-cms",
+    title: "CMS 四个阶段是什么？为什么被淘汰？",
+    collections: ["cms"],
+    level: "进阶",
+    answer:
+      "初始标记 STW、并发标记、重新标记 STW、并发清除。清除不压缩，堆碎片化，大对象可能放不下，并发失败就退化成 Serial Old Full GC。JDK 9 弃用，14 删除。现在问 CMS 重点是过程、碎片、失败路径，以及为什么默认换成 G1。",
+    points: ["两段 STW，两段并发", "不整理 → 碎片", "JDK 14 已删除"],
+  },
+  {
+    id: "jvm-g1-mixed",
+    title: "G1 的 Mixed GC 是什么？和 Full GC 有何不同？",
+    collections: ["g1"],
+    level: "进阶",
+    answer:
+      "G1 堆是 Region。Young GC 收年轻 Region。并发标记后按垃圾收益排序，Mixed GC 一次 STW 收掉全部年轻代再加一组老 Region。这是常规回收老年代的方式，不是失败。Full GC 才是 G1 搬不完、分配失败时的整堆兜底，很重。停顿目标 MaxGCPauseMillis 是目标不是保证。",
+    points: ["Region + Garbage First", "Mixed ≠ Full", "SATB 写屏障"],
+  },
+  {
+    id: "jvm-zgc",
+    title: "ZGC 为什么停顿可以很短？哪一版能用于生产？",
+    collections: ["zgc"],
+    level: "进阶",
+    answer:
+      "染色指针把标记/重定位信息放进指针，读引用走读屏障，对象搬走了也能转到新地址，所以转移可以和应用并发，停顿不随堆线性变大。JDK 11 实验，15 生产就绪，21 分代 ZGC。它不是零 STW。小堆或 JDK 8 用 G1/CMS 那条线。",
+    points: ["读屏障 + 着色指针", "15 生产 / 21 分代", "仍有短 STW"],
+  },
+  {
+    id: "jvm-tools",
+    title: "jps、jstat、jmap、jstack、Arthas 分别什么时候用？",
+    collections: ["jvm-tools"],
+    level: "基础",
+    answer:
+      "jps 找 pid。jstat -gcutil 看各区和 GC 计数，判断是不是 Full 循环。jmap histo 或 dump 看堆占用，JDK 9+ 可用 jcmd GC.heap_dump。jstack 看线程、死锁、CPU 热点（top -H 对 nid）。Arthas 在不能停机时 dashboard/thread/jad/watch/trace。dump 会 STW，生产要挑实例。",
+    points: [
+      "先现象再命令",
+      "GC→jstat，堆→jmap，线程→jstack",
+      "Arthas 补不停机的方法级观察",
+    ],
+  },
 ];

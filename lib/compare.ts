@@ -1,5 +1,5 @@
 import type { CollectionGuide } from "@/lib/collections";
-import { collectionTopics, languageTopics } from "@/lib/collections";
+import { collectionTopics, jvmModuleTopics, languageTopics } from "@/lib/collections";
 
 export const compareColumns = [
   { key: "name", label: "集合" },
@@ -102,3 +102,29 @@ export const languageCompareRows = languageTopics.map((item) => ({
   oneLiner: item.oneLiner,
   fact: item.defaultCapacity,
 }));
+
+export const jvmCompareRows = jvmModuleTopics.map((item) => ({
+  id: item.id,
+  name: item.name,
+  kind: item.kind,
+  oneLiner: item.oneLiner,
+  fact: item.defaultCapacity,
+}));
+
+export const jvmDecisionSteps = [
+  {
+    title: "分不清 Young / Full / Mixed？",
+    yes: "Young/Minor 只收年轻代。Full 收整堆。Mixed 是 G1：年轻代全部 + 部分老 Region。别用 Major 糊弄。",
+    no: "继续看停顿和收集器版本。",
+  },
+  {
+    title: "JDK 8 低延迟还是 JDK 11/17 默认？",
+    yes: "JDK 8 存量可能是 CMS，但 14 已删除。JDK 9+ 默认 G1。超大堆低延迟看 ZGC（15 生产，21 分代）。",
+    no: "吞吐型批处理 Parallel 仍可能更合适。",
+  },
+  {
+    title: "线上先抓什么？",
+    yes: "jps 找 pid → jstat 看 GC → 泄漏 jmap/dump → 卡住 jstack。不能停机再用 Arthas。",
+    no: "OOM 和 SOE 先分清是堆还是栈，再选工具。",
+  },
+];

@@ -13,14 +13,14 @@ export default function HomePage() {
     <div className="grid gap-10">
       <section className="grid gap-4">
         <Badge variant="secondary" className="w-fit">
-          以 JDK 8 及以后为准，JDK 7 差异会单独标出
+          以 JDK 8 及以后为准，收集器版本差会单独标出
         </Badge>
         <h1 className="text-3xl font-semibold tracking-tight sm:text-4xl">
-          集合和 Java 8，先看成一张图
+          集合、Java 8 和 JVM，先看成一张图
         </h1>
         <p className="max-w-2xl text-[15px] leading-7 text-muted-foreground">
-          集合是容器，泛型是容器上的标签，Stream 是从容器里取数据的流水线。
-          每个专题内部还有自己的主链——比如 HashMap 就是一次 put 走到底。
+          集合是容器，泛型是容器上的标签，Stream 是流水线，JVM 是它们跑起来的场地。
+          每个专题内部还有自己的主链——比如 HashMap 就是一次 put，G1 就是走到 Mixed GC。
         </p>
         <div className="flex flex-wrap gap-2">
           <Link href="/compare" className={cn(buttonVariants())}>
@@ -36,7 +36,7 @@ export default function HomePage() {
       </section>
 
       <section className="grid gap-3">
-        <h2 className="text-lg font-semibold tracking-tight">三条主线</h2>
+        <h2 className="text-lg font-semibold tracking-tight">知识地图</h2>
         <div className="grid gap-3">
           {moduleGuides.map((mod) => (
             <div key={mod.id} className="grid gap-3 rounded-xl border px-4 py-4">
@@ -55,7 +55,7 @@ export default function HomePage() {
       <section className="rounded-xl border bg-muted/30 px-4 py-4">
         <h2 className="text-sm font-semibold">建议学习顺序</h2>
         <p className="mt-1 text-sm text-muted-foreground">
-          按理解依赖排，不是按面试出镜率。突击可以先跳到 HashMap / ArrayList。
+          按理解依赖排，不是按面试出镜率。突击可以先跳到 HashMap / G1 / jstack。
         </p>
         <ol className="mt-3 grid gap-1.5 text-sm leading-6 sm:grid-cols-2">
           {learnPath.map((step, index) => {
