@@ -29,6 +29,9 @@ export default function HomePage() {
           <Link href="/questions" className={cn(buttonVariants({ variant: "outline" }))}>
             刷面试题
           </Link>
+          <Link href="/notes" className={cn(buttonVariants({ variant: "outline" }))}>
+            我的笔记
+          </Link>
         </div>
       </section>
 

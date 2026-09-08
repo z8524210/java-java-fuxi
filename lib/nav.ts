@@ -5,6 +5,7 @@ export const pageLinks = [
   { href: "/", label: "总览" },
   { href: "/compare", label: "对照表" },
   { href: "/questions", label: "面试题" },
+  { href: "/notes", label: "笔记" },
 ] as const;
 
 function toLinks(items: (typeof topicsByModule)[keyof typeof topicsByModule]) {
