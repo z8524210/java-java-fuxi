@@ -9,11 +9,11 @@ import {
   TableHeader,
   TableRow,
 } from "@/components/ui/table";
-import { compareRows, complexityRows, languageCompareRows } from "@/lib/compare";
+import { compareRows, complexityRows, jvmCompareRows, languageCompareRows } from "@/lib/compare";
 
 export const metadata: Metadata = {
   title: "对照表",
-  description: "七个 Java 集合对照，以及泛型 / Stream / Optional 等语言特性速记。",
+  description: "七个 Java 集合对照，泛型 / Stream，以及 JVM 内存、收集器、排查工具。",
 };
 
 export default function ComparePage() {
@@ -22,7 +22,7 @@ export default function ComparePage() {
       <header className="grid gap-2">
         <h1 className="text-3xl font-semibold tracking-tight">一张表看完差异</h1>
         <p className="max-w-2xl text-[15px] leading-7 text-muted-foreground">
-          集合按结构对照。语言特性按模块对照。HashMap 家族记住：主干是 put 链，其它 Map 只是在这条链上加了一轴。
+          集合按结构对照。语言特性按模块对照。JVM 按「内存 → 收集器 → 工具」对照。
         </p>
       </header>
 
@@ -134,8 +134,41 @@ export default function ComparePage() {
         </div>
       </section>
 
+      <section className="grid gap-3">
+        <h2 className="text-lg font-semibold">JVM</h2>
+        <p className="text-sm text-muted-foreground">
+          内存怎么切、垃圾怎么收、线上怎么查。版本差要说清：CMS 在 14 删除，G1 是 9 默认，ZGC 15 生产、21 分代。
+        </p>
+        <div className="rounded-xl border">
+          <Table>
+            <TableHeader>
+              <TableRow>
+                <TableHead>主题</TableHead>
+                <TableHead>分类</TableHead>
+                <TableHead>版本 / 口径</TableHead>
+                <TableHead>一句话</TableHead>
+              </TableRow>
+            </TableHeader>
+            <TableBody>
+              {jvmCompareRows.map((row) => (
+                <TableRow key={row.id}>
+                  <TableCell className="font-medium">
+                    <Link href={`/${row.id}`} className="underline-offset-4 hover:underline">
+                      {row.name}
+                    </Link>
+                  </TableCell>
+                  <TableCell>{row.kind}</TableCell>
+                  <TableCell className="whitespace-normal min-w-40">{row.fact}</TableCell>
+                  <TableCell className="whitespace-normal min-w-64">{row.oneLiner}</TableCell>
+                </TableRow>
+              ))}
+            </TableBody>
+          </Table>
+        </div>
+      </section>
+
       <section className="grid gap-3 rounded-xl border bg-muted/30 p-4">
-        <h2 className="text-lg font-semibold">容易混的三组</h2>
+        <h2 className="text-lg font-semibold">容易混的几组</h2>
         <ul className="grid gap-2 text-sm leading-7">
           <li>
             <strong>HashMap 家族：</strong>
@@ -164,6 +197,18 @@ export default function ComparePage() {
           <li>
             <strong>orElse vs orElseGet：</strong>
             默认值总会算 / 只在 Optional 为空时才算。
+          </li>
+          <li>
+            <strong>Young / Minor vs Full vs Mixed：</strong>
+            年轻代 / 整堆 / G1 的年轻代加一部分老 Region。
+          </li>
+          <li>
+            <strong>CMS vs G1 vs ZGC：</strong>
+            标记清除会碎片且已删除 / Region + Mixed / 读屏障并发转移。
+          </li>
+          <li>
+            <strong>OOM vs StackOverflowError：</strong>
+            堆或本地内存要不到 / 线程栈太深。
           </li>
         </ul>
       </section>

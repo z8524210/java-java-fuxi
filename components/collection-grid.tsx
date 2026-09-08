@@ -42,7 +42,7 @@ export function CollectionGrid() {
         <Input
           value={keyword}
           onChange={(event) => setKeyword(event.target.value)}
-          placeholder="筛选：put、PECS、惰性、resize…"
+          placeholder="筛选：put、PECS、Mixed、jstack…"
           className="sm:max-w-64"
         />
       </div>

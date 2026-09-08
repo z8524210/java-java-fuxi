@@ -47,6 +47,33 @@ export const moduleGuides: ModuleGuide[] = [
       "concurrenthashmap",
     ],
   },
+  {
+    id: "JVM 内存",
+    name: "JVM 内存",
+    spineTitle: "对象进堆到撑不住",
+    spine: ["对象创建", "对象布局", "GC Root", "分代 GC", "OOM / SOE"],
+    role: "代码跑起来的场地。对象怎么创建、怎么切字节、GC 从哪走、代怎么分、撑满了报什么错。",
+    learn: "先把一次 new 和对象头讲顺，再谈谁算垃圾、Young/Full 差在哪，最后才是 OOM。",
+    topicIds: ["object-create", "object-layout", "gc-root", "generational-gc", "oom"],
+  },
+  {
+    id: "垃圾回收",
+    name: "垃圾回收",
+    spineTitle: "从并发标记到选收集器",
+    spine: ["三色标记 + 写屏障", "CMS", "G1 Mixed", "ZGC"],
+    role: "在不停世界太久的前提下把垃圾收掉。零件是三色和屏障，产品是 CMS / G1 / ZGC。",
+    learn: "先懂 STW 和漏标，再按版本讲 CMS 为什么退、G1 的 Mixed、ZGC 为什么停顿短。",
+    topicIds: ["tricolor", "cms", "g1", "zgc"],
+  },
+  {
+    id: "JVM 实战",
+    name: "JVM 实战",
+    spineTitle: "从 pid 到证据",
+    spine: ["jps", "jstat", "jmap", "jstack", "Arthas"],
+    role: "前面那些概念在线上怎么落地。先定位进程，再看 GC、堆、线程。",
+    learn: "现象选工具：GC 看 jstat，泄漏 dump，卡顿 jstack，不能停机上 Arthas。",
+    topicIds: ["jvm-tools"],
+  },
 ];
 
 export const learnPath: { id: CollectionId; reason: string }[] = [
@@ -63,6 +90,16 @@ export const learnPath: { id: CollectionId; reason: string }[] = [
   { id: "treemap", reason: "另一条轴：按 key 排序" },
   { id: "concurrenthashmap", reason: "另一条轴：并发" },
   { id: "linkedlist", reason: "对照 ArrayList，多数情况用不上" },
+  { id: "object-create", reason: "new 之后对象怎么进堆" },
+  { id: "object-layout", reason: "对象头里为什么有锁和年龄" },
+  { id: "gc-root", reason: "什么叫还活着" },
+  { id: "generational-gc", reason: "Young / Full / Mixed 别混" },
+  { id: "oom", reason: "堆满和栈深不是一回事" },
+  { id: "tricolor", reason: "并发 GC 为什么要写屏障" },
+  { id: "cms", reason: "JDK 8 老收集器，知道为什么淘汰" },
+  { id: "g1", reason: "默认收集器，Mixed GC 是什么" },
+  { id: "zgc", reason: "大堆低延迟怎么做到" },
+  { id: "jvm-tools", reason: "线上用哪条命令" },
 ];
 
 function pick(ids: CollectionId[]): CollectionGuide[] {
@@ -73,4 +110,7 @@ export const topicsByModule = {
   类型系统: pick(moduleGuides[0].topicIds),
   函数式: pick(moduleGuides[1].topicIds),
   集合: pick(moduleGuides[2].topicIds),
+  "JVM 内存": pick(moduleGuides[3].topicIds),
+  垃圾回收: pick(moduleGuides[4].topicIds),
+  "JVM 实战": pick(moduleGuides[5].topicIds),
 } as Record<KnowledgeModule, CollectionGuide[]>;

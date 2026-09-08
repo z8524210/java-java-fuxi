@@ -21,4 +21,7 @@ export const navGroups = [
   { title: "类型系统", links: toLinks(topicsByModule.类型系统) },
   { title: "函数式", links: toLinks(topicsByModule.函数式) },
   { title: "集合", links: toLinks(topicsByModule.集合) },
+  { title: "JVM 内存", links: toLinks(topicsByModule["JVM 内存"]) },
+  { title: "垃圾回收", links: toLinks(topicsByModule.垃圾回收) },
+  { title: "JVM 实战", links: toLinks(topicsByModule["JVM 实战"]) },
 ] as const;

@@ -21,7 +21,7 @@ export const metadata: Metadata = {
     template: "%s · Java 面试速记",
   },
   description:
-    "集合是容器，泛型是标签，Stream 是流水线。每个专题内部有自己的主链，例如 HashMap 的一次 put。",
+    "集合是容器，泛型是标签，Stream 是流水线，JVM 是它们跑起来的场地。每个专题内部有自己的主链。",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {

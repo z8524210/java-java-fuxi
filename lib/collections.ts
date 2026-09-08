@@ -1,3 +1,5 @@
+import { jvmTopics } from "@/lib/jvm";
+
 export type CollectionId =
   | "arraylist"
   | "linkedlist"
@@ -11,13 +13,38 @@ export type CollectionId =
   | "stream"
   | "lambda"
   | "functional-interface"
-  | "optional";
+  | "optional"
+  | "object-create"
+  | "object-layout"
+  | "gc-root"
+  | "generational-gc"
+  | "oom"
+  | "tricolor"
+  | "cms"
+  | "g1"
+  | "zgc"
+  | "jvm-tools";
 
-export type CollectionKind = "List" | "Map" | "Set" | "类型系统" | "函数式" | "工具类";
+export type CollectionKind =
+  | "List"
+  | "Map"
+  | "Set"
+  | "类型系统"
+  | "函数式"
+  | "工具类"
+  | "JVM"
+  | "GC"
+  | "工具";
 
-export type TopicCategory = "集合" | "语言特性";
+export type TopicCategory = "集合" | "语言特性" | "JVM";
 
-export type KnowledgeModule = "类型系统" | "函数式" | "集合";
+export type KnowledgeModule =
+  | "类型系统"
+  | "函数式"
+  | "集合"
+  | "JVM 内存"
+  | "垃圾回收"
+  | "JVM 实战";
 
 export type SpineStep = {
   label: string;
@@ -66,7 +93,7 @@ export type CollectionGuide = {
   facts?: { label: string; value: string }[];
 };
 
-export const collections: CollectionGuide[] = [
+const coreTopics: CollectionGuide[] = [
   {
     id: "arraylist",
     name: "ArrayList",
@@ -1774,10 +1801,13 @@ user.ifPresent(u -> cache.put(id, u));
   },
 ];
 
+export const collections: CollectionGuide[] = [...coreTopics, ...jvmTopics];
+
 export const collectionTopics = collections.filter((item) => item.module === "集合");
 export const typeTopics = collections.filter((item) => item.module === "类型系统");
 export const functionalTopics = collections.filter((item) => item.module === "函数式");
-export const languageTopics = collections.filter((item) => item.module !== "集合");
+export const languageTopics = collections.filter((item) => item.category === "语言特性");
+export const jvmModuleTopics = collections.filter((item) => item.category === "JVM");
 
 export const collectionMap = Object.fromEntries(
   collections.map((item) => [item.id, item])

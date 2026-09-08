@@ -87,7 +87,7 @@ export function SiteHeader() {
           <div className="leading-tight">
             <div className="text-sm font-semibold tracking-tight">Java 面试速记</div>
             <div className="hidden text-[11px] text-muted-foreground sm:block">
-              类型系统 · 函数式 · 集合
+              类型系统 · 函数式 · 集合 · JVM
             </div>
           </div>
         </Link>

@@ -355,6 +355,156 @@ function OptionalDiagram() {
   );
 }
 
+function ObjectCreateDiagram() {
+  return (
+    <Frame caption="new 先保证类就绪，再在 TLAB 里划一块，填零、写头，最后才 <init>。">
+      <div className="flex flex-wrap items-center gap-1 text-xs">
+        {["new", "类检查", "TLAB 分配", "零值", "对象头", "<init>"].map((step, index) => (
+          <div key={step} className="flex items-center gap-1">
+            {index > 0 && <span className="text-muted-foreground">→</span>}
+            <Box active={index === 2}>{step}</Box>
+          </div>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+function ObjectLayoutDiagram() {
+  return (
+    <Frame caption="64 位开压缩指针时，空 Object 常见 16 字节：头 + 类型指针 + 对齐。">
+      <div className="flex flex-wrap items-center gap-1 text-xs">
+        <Box active>Mark Word 8B</Box>
+        <Box>Klass 4B</Box>
+        <Box>字段</Box>
+        <Box>padding</Box>
+      </div>
+    </Frame>
+  );
+}
+
+function GcRootDiagram() {
+  return (
+    <Frame caption="从根出发能走到的才活。两对象互指但脱离根，一样可以收。">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <Box active>栈 / 静态 / JNI</Box>
+        <span className="text-muted-foreground">→</span>
+        <Box>活对象</Box>
+        <span className="text-muted-foreground">走不到</span>
+        <Box>垃圾</Box>
+      </div>
+    </Frame>
+  );
+}
+
+function GenerationalGcDiagram() {
+  return (
+    <Frame caption="Young/Minor 收年轻代。Full 收整堆。Mixed 是 G1：年轻代 + 一部分老 Region。">
+      <div className="grid gap-2 text-xs sm:grid-cols-3">
+        <div className="rounded-lg border bg-background px-3 py-2">
+          <div className="font-medium">Eden + S0/S1</div>
+          <div className="text-muted-foreground">Young / Minor GC</div>
+        </div>
+        <div className="rounded-lg border bg-background px-3 py-2">
+          <div className="font-medium">老年代</div>
+          <div className="text-muted-foreground">Old / Mixed</div>
+        </div>
+        <div className="rounded-lg border bg-background px-3 py-2">
+          <div className="font-medium">整堆</div>
+          <div className="text-muted-foreground">Full GC</div>
+        </div>
+      </div>
+    </Frame>
+  );
+}
+
+function OomDiagram() {
+  return (
+    <Frame caption="OOM 在堆或本地内存；SOE 在线程栈。先读异常后面那句话。">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <Box active>heap / Metaspace / Direct</Box>
+        <span className="text-muted-foreground">OOM</span>
+        <Box>线程栈 -Xss</Box>
+        <span className="text-muted-foreground">SOE</span>
+      </div>
+    </Frame>
+  );
+}
+
+function TricolorDiagram() {
+  return (
+    <Frame caption="白未访、灰待扫、黑完成。漏标靠写屏障补；STW 只留给必须静止的片段。">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <Box>白</Box>
+        <span className="text-muted-foreground">→</span>
+        <Box>灰</Box>
+        <span className="text-muted-foreground">→</span>
+        <Box active>黑</Box>
+        <span className="text-muted-foreground">赋值时</span>
+        <Box>写屏障</Box>
+      </div>
+    </Frame>
+  );
+}
+
+function CmsDiagram() {
+  return (
+    <Frame caption="初始标记 / 再标记 STW，中间并发。清除不整理，碎片多了可能 Concurrent Mode Failure。">
+      <div className="flex flex-wrap items-center gap-1 text-xs">
+        {["初始标记", "并发标记", "再标记", "并发清除"].map((step, index) => (
+          <div key={step} className="flex items-center gap-1">
+            {index > 0 && <span className="text-muted-foreground">→</span>}
+            <Box active={index === 0 || index === 2}>{step}</Box>
+          </div>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
+function G1Diagram() {
+  return (
+    <Frame caption="Region 堆。Mixed = 所有年轻 Region + 一组垃圾最多的老 Region。">
+      <div className="flex flex-wrap gap-1 text-xs">
+        {["Y", "Y", "O", "Y", "H", "O"].map((tag, index) => (
+          <Box key={`${tag}-${index}`} active={tag === "Y"}>
+            {tag}
+          </Box>
+        ))}
+        <span className="self-center text-muted-foreground">Y 年轻 · O 老 · H 大对象</span>
+      </div>
+    </Frame>
+  );
+}
+
+function ZgcDiagram() {
+  return (
+    <Frame caption="读引用走读屏障。对象搬走了也能改到新地址，所以停顿不跟堆大小成正比。">
+      <div className="flex flex-wrap items-center gap-2 text-xs">
+        <Box>旧地址</Box>
+        <span className="text-muted-foreground">读屏障</span>
+        <Box active>新地址</Box>
+        <span className="text-muted-foreground">应用不用长停</span>
+      </div>
+    </Frame>
+  );
+}
+
+function JvmToolsDiagram() {
+  return (
+    <Frame caption="先 pid，再选工具：GC 用 jstat，堆用 jmap，线程用 jstack，不停机用 Arthas。">
+      <div className="flex flex-wrap items-center gap-1 text-xs">
+        {["jps", "jstat", "jmap", "jstack", "Arthas"].map((step, index) => (
+          <div key={step} className="flex items-center gap-1">
+            {index > 0 && <span className="text-muted-foreground">→</span>}
+            <Box active={index === 0}>{step}</Box>
+          </div>
+        ))}
+      </div>
+    </Frame>
+  );
+}
+
 const diagrams: Record<CollectionId, () => ReactNode> = {
   arraylist: ArrayListDiagram,
   linkedlist: LinkedListDiagram,
@@ -369,6 +519,16 @@ const diagrams: Record<CollectionId, () => ReactNode> = {
   lambda: LambdaDiagram,
   "functional-interface": FunctionalInterfaceDiagram,
   optional: OptionalDiagram,
+  "object-create": ObjectCreateDiagram,
+  "object-layout": ObjectLayoutDiagram,
+  "gc-root": GcRootDiagram,
+  "generational-gc": GenerationalGcDiagram,
+  oom: OomDiagram,
+  tricolor: TricolorDiagram,
+  cms: CmsDiagram,
+  g1: G1Diagram,
+  zgc: ZgcDiagram,
+  "jvm-tools": JvmToolsDiagram,
 };
 
 export function StructureDiagram({ id }: { id: CollectionId }) {
