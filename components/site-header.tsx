@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu } from "lucide-react";
@@ -74,6 +75,8 @@ function NavLinks({ onNavigate }: { onNavigate?: () => void }) {
 }
 
 export function SiteHeader() {
+  const [open, setOpen] = useState(false);
+
   return (
     <header className="sticky top-0 z-40 border-b bg-background/90 backdrop-blur-md">
       <div className="mx-auto flex h-14 w-full max-w-6xl items-center justify-between px-4">
@@ -99,7 +102,7 @@ export function SiteHeader() {
             </Link>
           ))}
         </div>
-        <Sheet>
+        <Sheet open={open} onOpenChange={setOpen}>
           <SheetTrigger
             render={
               <Button variant="outline" size="icon-sm" className="md:hidden" />
@@ -108,11 +111,16 @@ export function SiteHeader() {
             <Menu />
             <span className="sr-only">打开目录</span>
           </SheetTrigger>
-          <SheetContent side="left" className="w-72 p-4">
-            <SheetHeader className="px-0">
+          <SheetContent
+            side="left"
+            className="w-72 p-4"
+          >
+            <SheetHeader className="shrink-0 px-0">
               <SheetTitle>目录</SheetTitle>
             </SheetHeader>
-            <NavLinks />
+            <div className="min-h-0 flex-1 overflow-y-scroll overscroll-contain touch-pan-y pb-[max(1.5rem,env(safe-area-inset-bottom))] [-webkit-overflow-scrolling:touch]">
+              <NavLinks onNavigate={() => setOpen(false)} />
+            </div>
           </SheetContent>
         </Sheet>
       </div>
@@ -122,7 +130,7 @@ export function SiteHeader() {
 
 export function SideNav() {
   return (
-    <aside className="sticky top-20 hidden h-[calc(100vh-6rem)] w-52 shrink-0 overflow-y-auto md:block">
+    <aside className="sticky top-20 hidden h-[calc(100dvh-6rem)] w-52 shrink-0 overflow-y-auto overscroll-contain md:block">
       <NavLinks />
     </aside>
   );
